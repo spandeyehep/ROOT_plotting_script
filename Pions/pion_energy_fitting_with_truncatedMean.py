@@ -3,7 +3,6 @@ import numpy as np
 import ROOT as rt
 from array import array
 from ROOT import TCanvas, TFile, TPaveText, TPaveStats
-from ROOT import TLorentzVector
 import math
 
 
@@ -11,12 +10,7 @@ calib = sys.argv[1] # 'fixed', 'Ebeam', 'Ereco'
 shower = sys.argv[2] # 'EE', 'FH', 'all'
 method = sys.argv[3] # 'gaus', 'trunc90' , 'trunc95', 'trunc100', 'histmean'
 sample = sys.argv[4]  # 'data', 'FTFP_BERT_EMN', 'QGSP_FTFP_BERT_EMN'
-#version =  sys.argv[5] # 'scaled', 'unscaled'
 
-#version = ["v44_VtxBeam_v3_correctFH10","v46_patchMIP"]
-
-#scaling = int(sys.argv[5])
-#flag =  int(sys.argv[3])
 dir_name = "./sim"
 
 
@@ -26,7 +20,6 @@ def calculateError(x,dx,y,dy,cov_):
     #return ((x/y)*(np.sqrt(np.square(dx/x) + np.square(dy/y) - 2*cov_/(x*y))))
     return ((x/y)*(np.sqrt(np.square(dx/x) + np.square(dy/y))))
 
-#def generate_plot(h_def, h_2, h_nocut, can_)
 
 def TruncRMS(H, lvl):
   mx = H.GetMaximumBin()
@@ -78,7 +71,7 @@ showResponse = True
 canvas_name = "pion_energy"
 c = rt.TCanvas("c", "yolo", 600, 600); #FOR WebPage
 
-#rt.gStyle.SetOptStat(1111);
+
 rt.gStyle.SetOptStat(0);
 rt.gStyle.SetOptFit(0);
 legend = rt.TLegend(0.30,0.9,0.9,0.35)
@@ -268,10 +261,6 @@ rt.gPad.Modified()
 if(save_canvas):
     #c.SaveAs("plots/"+str(sample)+"_energy_hist_WITH_FIT_overlay.png")
     c.SaveAs("plots/gaus_fits_for_resp_reso/%s_chi2method%s_energy_hist_WITH_FIT_overlay_%s_%s.png"%(sample,calib,shower,method))
-    # c.SaveAs("plots/energy_hist_WITH_FIT_overlay.jpg")
-    # c.SaveAs("plots/energy_hist_WITH_FIT_overlay.gif")
-    # c.SaveAs("plots/energy_hist_WITH_FIT_overlay.C")
-    # c.SaveAs("plots/energy_hist_WITH_FIT_overlay.root")
     # c.SaveAs("plots/energy_hist_WITH_FIT_overlay.pdf")
 
 
@@ -279,8 +268,7 @@ if(save_canvas):
 ###################################################################################
 ###################################################################################
 
-# resp_fname = "./txt_files/response_"+calib+"_"+shower+".txt"
-# reso_fname = "./txt_files/resolution_"+calib+"_"+shower+".txt"
+
 if(sample == "data"):
     resp_fname = "./txt_files/response_resolution/data/response_%s_chi2method%s_%s_%s.txt"%(sample,calib,shower,method)
     reso_fname = "./txt_files/response_resolution/data/resolution_%s_chi2method%s_%s_%s.txt"%(sample,calib,shower,method)
@@ -293,13 +281,11 @@ else:
 
     mu_fname = "./txt_files/response_resolution/sim/mu_%s_chi2method%s_%s_%s.txt"%(sample,calib,shower,method)
     sigma_fname = "./txt_files/response_resolution/sim/sigma_%s_chi2method%s_%s_%s.txt"%(sample,calib,shower,method)
-c1 = rt.TCanvas("c1","Response and Resolution",500,250)
 
-c1.Divide(2)
+
 
 x_p, x_e, y1_p, y2_p ,y1_e, y2_e = array( 'd' ),array( 'd' ),array( 'd' ),array( 'd' ),array( 'd' ),array( 'd' )
-# x = [0,20,50,80,100,120]
-# y1 = [0,20,50,80,100,120]
+
 n1= 8
 
 i = 0
@@ -310,18 +296,7 @@ else:
     print "Printing Resolution values..."
     print"beam_Energy \t resolution \t error_on_beam \t error_on_resolution"
 
-# resp_fname = "./txt_files/response_"+sample+"_"+shower+"_5percent.txt"
-# reso_fname = "./txt_files/resolution_"+sample+"_"+shower+"_5percent.txt"
 
-# if(flag == 1):
-#     resp_fname = "./txt_files/response_"+sample+"_"+shower+".txt"
-#     reso_fname = "./txt_files/resolution_"+sample+"_"+shower+".txt"
-# elif(flag==2 and sample=="sim"):
-#     resp_fname = "./txt_files/response_"+sample+"_"+shower+"_unScaled.txt"
-#     reso_fname = "./txt_files/resolution_"+sample+"_"+shower+"_unScaled.txt"
-# else:
-#     print "Invalid Flag"
-#     sys.exit()
 resp_txt = open(resp_fname,'w')
 reso_txt = open(reso_fname,'w')
 
@@ -384,112 +359,3 @@ reso_txt.close()
 print "Following files written!!"
 print resp_fname
 print reso_fname
-line = rt.TLine(0.0,1.0,320,1.0);
-line.SetLineStyle(2);
-line.SetLineWidth(2);
-line.SetLineColor(rt.kRed);
-
-#gr1 = rt.TGraph(n1,x_p,y1_p)
-#gr2 = rt.TGraph(n1,x_p,y2_p)
-
-gr1 = rt.TGraphErrors(n1,x_p,y1_p,x_e,y1_e)
-gr2 = rt.TGraphErrors(n1,x_p,y2_p,x_e,y2_e)
-
-gr1.SetTitle("Response")
-#gr1.GetXaxis().SetTitleSize(0.04);
-gr1.GetXaxis().SetTitleSize(1.0);
-gr1.GetXaxis().SetLabelSize(0.06);
-gr1.GetYaxis().SetLabelSize(0.05);
-# gr1.GetYaxis().SetLabelSize(0.04);
-gr1.GetXaxis().SetTitle("Beam Energy (in GeV)");
-gr1.GetYaxis().SetTitle("Mean (in MIPs)");
-# gr1.GetXaxis().SetTitleOffset(0.9);
-gr1.GetXaxis().SetTitleOffset(1.0);
-
-gr1.GetXaxis().SetTitleSize(0.5);
-gr1.GetYaxis().SetTitleOffset(1.45);
-gr1.SetMarkerColor( 4 )
-gr1.SetMarkerSize( 1.3 )
-gr1.SetMarkerStyle( 22 )
-gr1.GetXaxis().SetRangeUser(0,320)
-gr1.GetYaxis().SetRangeUser(0.85,1.2)
-#gr1.GetYaxis().SetRangeUser(0.5,1.7)
-
-gr2.SetTitle("Resolution")
-gr2.GetXaxis().SetTitleSize(0.04);
-# gr2.GetXaxis().SetLabelSize(0.035);
-# gr2.GetYaxis().SetLabelSize(0.03);
-
-gr2.GetXaxis().SetLabelSize(0.06);
-gr2.GetYaxis().SetLabelSize(0.05);
-
-gr2.GetYaxis().SetRangeUser(0.08,0.40)
-# gr2.GetYaxis().SetLabelSize(0.04);
-#gr2.GetXaxis().SetTitle("Beam Energy (in GeV)");
-#gr2.GetYaxis().SetTitle("Sigma/Mean");
-gr2.GetXaxis().SetTitleOffset(0.9);
-gr2.GetYaxis().SetTitleOffset(1.45);
-# gr2.GetYaxis().SetTitleOffset(2.0);
-gr2.SetMarkerColor( 4 )
-gr2.SetMarkerSize( 1.3 )
-gr2.SetMarkerStyle( 22 )
-gr2.GetXaxis().SetRangeUser(0,320)
-
-c1.cd(1)
-rt.gPad.SetGridx()
-rt.gPad.SetGridy()
-
-# gr1.Draw("AC*")
-gr1.Draw("AP")
-line.Draw("SAME")
-c1.cd(2)
-gr2.Draw("AP")
-
-rt.gPad.SetGridx()
-rt.gPad.SetGridy()
-rt.gPad.SetTickx()
-rt.gPad.SetTicky()
-
-fit_range_min = 18.0
-fit_range_max = 310.0
-reso = rt.TF1("reso","sqrt([0]*[0]+[1]*[1]/x+[2]*[2]/(x*x))",20,300)
-reso.SetParameters(0.06,1.20,0.)
-# gr2.Fit(reso,"","R",15,330)
-# gr2.Fit(reso,"","R",15,330)
-# gr2.Fit(reso,"","R",15,330)
-gr2.Fit(reso,"Q","R",fit_range_min,fit_range_max)
-# gr2.Fit(reso,"","R",fit_range_min,fit_range_max)
-# gr2.Fit(reso,"","R",fit_range_min,fit_range_max)
-
-#gr2.Fit(reso)
-reso.Draw("SAME")
-
-con1 = int(100*reso.GetParameter(0))
-con2 = int(10.0*(100*reso.GetParameter(0) - con1))
-const = str(con1)+"."+str(con2)
-
-sto = str(round(100*reso.GetParameter(1),2))
-sto = str(int(100*reso.GetParameter(1)))
-leg = "#sigma/E = "+sto+"%/#sqrt{E} + "+const+"%"
-legend1 = rt.TLegend(0.20,0.80,0.85,0.60)
-legend1.AddEntry(gr2,leg,"lp")
-legend1.Draw()
-
-c1.Update()
-rt.gPad.Update()
-
-# rt.gPad.SetGridx()
-# rt.gPad.SetGridy()
-# c1.Update()
-# rt.gPad.Update()
-#print reso.GetParameter(0),"\t",reso.GetParameter(1),"\t",reso.GetParameter(2),"\t"
-
-if(save_canvas):
-    #c1.SaveAs("plots/"+str(sample)+"_GAUS_FIT_mean_sigma_withResoFit.png")
-    c1.SaveAs("plots/%s_chi2method%s_GAUS_FIT_mean_sigma_withResoFit_%s_%s.png"%(sample,calib,shower,method))
-    # c1.SaveAs("plots/GAUS_FIT_mean_sigma_withResoFit.gif")
-    # c1.SaveAs("plots/GAUS_FIT_mean_sigma_withResoFit.jpg")
-    # c1.SaveAs("plots/GAUS_FIT_mean_sigma_withResoFit.C")
-    # c1.SaveAs("plots/GAUS_FIT_mean_sigma_withResoFit.root")
-    # c1.SaveAs("plots/GAUS_FIT_mean_sigma_withResoFit.C")
-    # c1.SaveAs("plots/GAUS_FIT_mean_sigma_withResoFit.pdf")
